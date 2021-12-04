@@ -208,7 +208,7 @@ def start_algo_classif(n, classif, data, target, predictor):
             return html.Div(
                     [
                           html.Br(),
-                          html.H5("Best parameter", style={'width': '40%', 'display':'block', 'margin-left':'auto', 'margin-right':'auto'}),
+                          html.H5("Best parameters", style={'width': '40%', 'display':'block', 'margin-left':'auto', 'margin-right':'auto'}),
                           dcc.Graph(figure=table_param),
                           html.Br(),
                           html.Div(
@@ -259,7 +259,7 @@ def start_algo_classif(n, classif, data, target, predictor):
                       html.Br(),
                       html.Div(
                           [
-                              html.H5("Best parameter", style={'display':'block', 'margin-left':'auto', 'margin-right':'auto'}),
+                              html.H5("Best parameters", style={'display':'block', 'margin-left':'auto', 'margin-right':'auto'}),
                               dcc.Graph(figure=table_param),
                               html.Br(),
                               daq.LEDDisplay(
@@ -321,7 +321,7 @@ def start_algo_regress(n, regress, data, target, predictor):
                       html.Div(
                           [
                               html.Br(),
-                              html.H5("Best parameter", style={'display':'block', 'margin-left':'auto', 'margin-right':'auto'}),
+                              html.H5("Best parameters", style={'display':'block', 'margin-left':'auto', 'margin-right':'auto'}),
                               dcc.Graph(figure=table_param, style={'width': '25%'}),
                               html.Br(),
                               html.Div(
