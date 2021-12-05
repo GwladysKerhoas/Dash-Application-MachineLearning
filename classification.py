@@ -30,34 +30,44 @@ import pydot
 import base64
 import xml
 
+
+# Classification class to gather all the classification algorithm
 class classification:
 
+    # Regression logistic algorithm
     def reg_log(target,predictor):
         
+        # Get the target and the predictor variables
         X = pd.DataFrame(predictor)
         y = pd.DataFrame(target)
         
+        # Split the data into train and test part
         X_train, X_test, y_train, y_test = train_test_split(X, y.values.ravel(), train_size=0.7, random_state=10)
         
-        scorer = make_scorer(accuracy_score) #Type de score
-        regressionLogistique = LogisticRegression(solver='liblinear', max_iter=5000) #Intaciation du modèle
-        params = {'C':[1,2,3], 'penalty':['l1', 'l2']} #Paramètres à tester
-        clf = GridSearchCV(regressionLogistique, param_grid=params, cv=5,scoring=scorer, n_jobs=5)
-        clf.fit(X_train, y_train) #On applique sur les données d'apprentissage
-    
-        best_param = clf.best_params_ #Meilleur paramètrage
-        best_score = round(clf.best_score_,2) #Meilleur score
+        scorer = make_scorer(accuracy_score) #Type of score
+        regressionLogistique = LogisticRegression(solver='liblinear', max_iter=5000) # Model instanciation
+        params = {'C':[1,2,3], 'penalty':['l1', 'l2']} # Paramaters to test
         
-        regressionLogistique = LogisticRegression(solver='liblinear', C=best_param["C"], penalty=best_param["penalty"]) #Intaciation du modèle avec paramètres optimaux identifiés
+        # Find the best parameters 
+        clf = GridSearchCV(regressionLogistique, param_grid=params, cv=5,scoring=scorer, n_jobs=5)
+        clf.fit(X_train, y_train) # We apply on the training data
+    
+        best_param = clf.best_params_ # Better setting
+        best_score = round(clf.best_score_,2) # Best score
+        
+        # Initiation of the model with identified optimal parameters
+        regressionLogistique = LogisticRegression(solver='liblinear', C=best_param["C"], penalty=best_param["penalty"]) 
     
         start = time()
     
+        # Predictive output
         y_pred = cross_val_predict(regressionLogistique, X_test, y_test, cv=5)
-        acc = round(accuracy_score(y_test, y_pred),2)
         
-        #metrics_class = metrics.classification_report(y_test, y_pred)
+        # Accuracy score
+        acc = round(accuracy_score(y_test, y_pred),2)
     
         end = time()
+        # Time of excecution of the algorithm
         time_execution = round(end-start,2)
         
         # Confusion matrix
@@ -118,30 +128,30 @@ class classification:
                 
         return best_param, best_score, acc, matrix_confusion, time_execution, fig, fig_table
     
-    
+    # Discriminant Analysis algorithm
     def adl(target,predictor):
         X = pd.DataFrame(predictor)
         y = pd.DataFrame(target)
         
         X_train, X_test, y_train, y_test = train_test_split(X, y.values.ravel(), train_size=0.7, random_state=10)
         
-        scorer = make_scorer(accuracy_score) #Type de score
-        adl = LinearDiscriminantAnalysis() #Intaciation du modèle
-        params = {'solver':['svd','lsqr','eigen']} #Paramètres à tester
+        scorer = make_scorer(accuracy_score) # Type of score
+        adl = LinearDiscriminantAnalysis() # Model instanciation
+        params = {'solver':['svd','lsqr','eigen']} # Parameters to test
         clf = GridSearchCV(adl, param_grid=params, cv=5,scoring=scorer, n_jobs=5)
-        clf.fit(X_train, y_train) #On applique sur les données d'apprentissage
+        clf.fit(X_train, y_train) # We apply on the training data
     
-        best_param = clf.best_params_ #Meilleur paramètrage
-        best_score = round(clf.best_score_,2) #Meilleur score
+        best_param = clf.best_params_ # Better setting
+        best_score = round(clf.best_score_,2) # Best score
         
-        adl = LinearDiscriminantAnalysis(solver=best_param["solver"]) #Intaciation du modèle avec paramètres optimaux identifiés
+        # Instantiation of the model with identified optimal parameters
+        adl = LinearDiscriminantAnalysis(solver=best_param["solver"]) 
     
         start = time()
     
+        # Predictions
         y_pred = cross_val_predict(adl, X_test, y_test, cv=5)
         acc = round(accuracy_score(y_test, y_pred),2)
-        
-        #metrics_class = metrics.classification_report(y_test, y_pred)
     
         end = time()
         time_execution = round(end-start,2)
@@ -205,27 +215,25 @@ class classification:
 
         return best_param, best_score, acc, matrix_confusion, time_execution, fig, fig_table
         
-    
+    # Decision tree algorithm
     def arbre_de_decision(target,predictor):
         X = pd.DataFrame(predictor)
         y = pd.DataFrame(target)
         
+        # Split the data into train and test
         X_train, X_test, y_train, y_test = train_test_split(X, y.values.ravel(), train_size=0.7, random_state=10)
         
         arbreFirst = DecisionTreeClassifier(min_samples_split=30,min_samples_leaf=10)
         arbreFirst.fit(X_train,y_train)
         
-        #plot_tree(arbreFirst,feature_names = list(df.columns[:-1]),filled=True)
-        #plt.show()
-        
-        scorer = make_scorer(accuracy_score) #Type de score
+        scorer = make_scorer(accuracy_score) # Type of score
 
         params = {'criterion':['gini','entropy'],
                   'splitter':['best', 'random'],
                   'max_depth':[5, 8, 11, 13],
                   'min_samples_leaf':[3, 4, 5],
                   'min_samples_split':[8, 10, 12],
-                 } #Paramètres à tester
+                 } # Paramètres to test
         
         clf = GridSearchCV(arbreFirst, param_grid=params, cv=5,scoring=scorer,n_jobs=5)
         clf.fit(X_train, y_train)
@@ -233,6 +241,7 @@ class classification:
         best_param = clf.best_params_ #Meilleur paramètrage
         best_score = round(clf.best_score_,2)
         
+        # Instantiation of the model with identified optimal parameters
         dectreeclassif = DecisionTreeClassifier(criterion=best_param["criterion"], max_depth=best_param["max_depth"], min_samples_leaf=best_param["min_samples_leaf"], min_samples_split=best_param["min_samples_split"], splitter=best_param["splitter"]) #Instanciation du modèle avec paramètres optimaux identifiés
 
         start = time()
@@ -300,11 +309,12 @@ class classification:
             width=700, height=500
         )
         
-        #arbre
+        # Tree
         dectreeclassif.fit(X_train, y_train)
         joblib.dump(dectreeclassif, open('model-random-split.joblib', 'wb'))
         pickle.dump(X_test.columns.values, open('feature_names.pickle', 'wb'))
         feature_names = pickle.load(open('feature_names.pickle', 'rb'))
+        
         def svg_to_fig(svg_bytes, title=None, plot_bgcolor='white', x_lock=False, y_lock=False):
             svg_enc = base64.b64encode(svg_bytes)
             svg = f'data:image/svg+xml;base64, {svg_enc.decode()}'
@@ -388,16 +398,7 @@ class classification:
         
         return best_param, best_score, acc, matrix_confusion, time_execution, fig, fig_table, fig1
     
-    
-# import pandas as pd
-# df = pd.read_csv("iris_data.csv", ",", encoding="Latin-1")
-# target = df["species"]
-# predictor =  df["sepal_length"]
 
-# # Séparation variable cible et variables prédictives
-# print(classification.reg_log(target,predictor))
-# #print(classification.adl(target,predictor))
-# #print(classification.arbre_de_decision(target,predictor))
 
 
 
