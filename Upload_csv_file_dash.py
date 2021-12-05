@@ -23,7 +23,9 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets,
                 suppress_callback_exceptions=True)
 
+# Application display
 app.layout = html.Div([ # this code section taken from Dash docs https://dash.plotly.com/dash-core-components/upload
+    # Upload the data from your computer                   
     dcc.Upload(
         id='upload-data',
         children=html.Div([
@@ -43,6 +45,7 @@ app.layout = html.Div([ # this code section taken from Dash docs https://dash.pl
         # Allow multiple files to be uploaded
         multiple=True
     ),
+    # Different output of the callback functions
     html.Div(id='output-div'),
     html.Div(id='output-datatable'),
     html.Div(id='output-division'),
@@ -51,7 +54,7 @@ app.layout = html.Div([ # this code section taken from Dash docs https://dash.pl
     html.Div(id='output-division4'),
 ])
 
-
+# Process and analyze data
 def parse_contents(contents, filename, date):
     content_type, content_string = contents.split(',')
 
@@ -70,10 +73,13 @@ def parse_contents(contents, filename, date):
             'There was an error processing this file.'
         ])
 
+    # Firts html division in which you can see the data with data table and graphs
     return html.Div([
         html.H5("Loaded file : " + filename),
         html.H6('View the data', style={"font-weight": "bold"}),
         html.P("Choose graph", style={"color": "grey"}),
+        
+        # Set a graph with x and y axis
         dcc.RadioItems(id="graph-selected",
                        options=[{'label': 'Bar Graph', 'value':'bar'},
                                 {'label': 'Scatter Plot', 'value':'scatter'}],
@@ -92,6 +98,7 @@ def parse_contents(contents, filename, date):
               'color': 'white'}),
         html.Hr(),
 
+        # Display of the data table
         dash_table.DataTable(
             data=df.to_dict('records'),
             columns=[{'name': i, 'id': i} for i in df.columns],
@@ -102,7 +109,7 @@ def parse_contents(contents, filename, date):
         # Horizontal line
         html.Hr(),  
         
-        
+        # Choose the target and the predictor variables for the prediction part
         html.H6('Choose the data',style={"font-weight": "bold"}),
         html.P("Target variable", style={"color": "grey"}),
         dcc.Dropdown(id='target',
@@ -110,6 +117,8 @@ def parse_contents(contents, filename, date):
         html.P("Predictor variables", style={"color": "grey"}),
         dcc.Dropdown(id='predictor',
                       options=[{'label':x, 'value':x} for x in df.columns], multi=True),
+        
+        # Click on the button to see which algorithm can fit with your variables
         html.Button(id="submit-button2", children="Show algorithm",style={
              'background-color': '#2dbecd',
               'color': 'white'}),
@@ -157,6 +166,7 @@ def algo_proposed(n, data, target):
     data = pd.DataFrame(data)
     if n is None:
         return dash.no_update
+    # If the target variable is quantitatve, the app will propose you regression algorithm
     elif data[target].dtypes != "object":
         return html.Div([
             html.P("Select your regression algorithm", style={"color": "grey"}),
@@ -165,6 +175,7 @@ def algo_proposed(n, data, target):
                                 {'label':'Regression tree', 'value':'regtree'},
                                 {'label':'Support Vector Regression', 'value':'vectreg'}]),
             ])
+    # Otherwise, the target is qualitative and the app will propose you classification algorithm
     else:
         return html.Div([
             html.P("Select your classification algorithm", style={"color": "grey"}),
@@ -174,7 +185,7 @@ def algo_proposed(n, data, target):
                                 {'label':'Regression logistic', 'value':'reglog'}]),
         ])
 
-
+# Start the algorithm with a click on a button
 @app.callback(Output('output-division2', 'children'),
               Input('submit-button2','n_clicks'),
               Input('target','value'))    
@@ -190,7 +201,7 @@ def start_algo(n,target):
               'color': 'white'})
     ])
 
- 
+# Set output of the classification algorithm
 @app.callback(Output('output-division3', 'children'),
               Input('submit-button3','n_clicks'),
               Input('classif','value'),
@@ -203,12 +214,17 @@ def start_algo_classif(n, classif, data, target, predictor):
     if n is None:
         return dash.no_update
     else:
+        # If the user choose the tree decision, the main file with use the "arbre_de_decision" function in the classification file
         if classif == "tree":
+            # Call of all the output of the "arbre_de_decision" function
             best_param, best_score, acc, matrix_confusion, time_execution, fig_ROC, table_param, tree = classification.arbre_de_decision(data[target],data[predictor])
+            
+            # Html division specific for the decision tree
             return html.Div(
                     [
                           html.Br(),
                           html.H5("Best parameters", style={'width': '40%', 'display':'block', 'margin-left':'auto', 'margin-right':'auto'}),
+                          # Show all the best parameters of the algorithm
                           dcc.Graph(figure=table_param),
                           html.Br(),
                           html.Div(
@@ -238,9 +254,11 @@ def start_algo_classif(n, classif, data, target, predictor):
                               ],className='pretty_container two columns',
                         ),
                         html.H5("Confusion Matrix", style={'width': '40%', 'display':'block', 'margin-left':'auto', 'margin-right':'auto'}),
+                        # Confusion matrix table
                         dcc.Graph(figure = matrix_confusion, style={'width': '40%', 'display':'block', 'margin-left':'auto', 'margin-right':'auto'}),
                         html.Div([
                                 html.H5("ROC curve", style={'width': '40%', 'display':'block', 'margin-left':'auto', 'margin-right':'auto'}),
+                                # Roc Curve for the decision tree based on the target and variables selected by the user
                                 dcc.Graph(figure=fig_ROC, style={'width': '40%', 'display':'block', 'margin-left':'auto', 'margin-right':'auto'}),
                                 html.H5("Decision tree explanation", style={'width': '40%', 'display':'block', 'margin-left':'auto', 'margin-right':'auto'}),
                                 dcc.Graph(figure=tree, style={'width': '90%', 'display':'block', 'margin-left':'auto', 'margin-right':'auto'})
@@ -291,21 +309,21 @@ def start_algo_classif(n, classif, data, target, predictor):
                     dcc.Graph(figure=fig_ROC, style={'width': '40%', 'display':'block', 'margin-left':'auto', 'margin-right':'auto'})
                     ])
     
-                    
-                   
-    
+# Set output of the regression algorithm
 @app.callback(Output('output-division4', 'children'),
               Input('submit-button3','n_clicks'),
               Input('regress','value'),
               Input('stored-data','data'),
               Input('target','value'),
               Input('predictor', 'value'))
+# This function will be active only if the user chooses a quantitative variable (Input 'regress')
 def start_algo_regress(n, regress, data, target, predictor):
     data = pd.DataFrame(data)
     
     if n is None:
         return dash.no_update
     else:
+        # If the user selected the linear regression, the main file with call the "linear_reg" function in the regression.py file
         if regress == "linear":
             best_param, best_score, r_carre, mse, time_execution, scatter_fig, table_param = regression.linear_reg(data[target],data[predictor])
         
@@ -315,7 +333,7 @@ def start_algo_regress(n, regress, data, target, predictor):
         if regress == "vectreg":
             best_param, best_score, r_carre, mse, time_execution, scatter_fig, table_param = regression.svr(data[target],data[predictor])
         
-        
+        # Output html division for regression algorithm : best parameters and scatter plot
         return html.Div(
                 [
                       html.Div(
@@ -369,7 +387,7 @@ def start_algo_regress(n, regress, data, target, predictor):
                     ])
         
   
-    
+# Run the app    
 app.run_server(port=8040, use_reloader=False)
 
     
