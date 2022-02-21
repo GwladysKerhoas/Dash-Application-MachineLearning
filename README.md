@@ -1,6 +1,6 @@
 # Dash-Application-MachineLearning
 
-This is a graphical interface to apply prediction algorithms on a dataset. The users of the tool are supposed to know nothing about Python programming.
+This is a graphical interface to apply prediction algorithms on a dataset. The users of the tool are supposed to know nothing about Python programming. The library "Dash" is used to design the graphical interface and integrate the visualisations using "Plotly". The application offer 3 classification algorithms (decision tree, regression logistic and discriminant analysis), or 3 regression algorithms (linear regression, decision tree regression, support vector regression) according to the type of the predictable variable. The user will be able to choose one or more of these algorithms to apply to the data.
 
 Run the app
 ----------------------
