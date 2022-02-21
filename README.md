@@ -1,8 +1,8 @@
 # Dash-Application-MachineLearning
 
-This is a user manual of the R package GradDesc. The purpose of the GradDesc package is to make a binary logistic regression with the use of the stochastic gradient descent algorithm. It works on every dataset but the exploratory variables have to be quantitative and the target variable has to be binary.
-In this demonstration, we are going to use two different datasets : “breast_cancer” and "default_of_credit_card_clients" from UCI dataset to see how the algorithm behaves by exploiting the capacities of multicore processors.
+This is a graphical interface to apply prediction algorithms on a dataset. The users of the tool are supposed to know nothing about Python programming.
 
-Installing the package and access to the library
+Run the app
 ----------------------
     
+Run the file 'Upload_csv_file_dash.py' on Spyder environment and tape on a browser the http : http://127.0.0.1:8040
